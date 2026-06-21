@@ -1,24 +1,24 @@
-# Kure — the Self-Healing Agent
+# AutoFix — the Self-Healing Agent
 
-**Kure is an autonomous incident-response agent.** It watches your service's
+**AutoFix is an autonomous incident-response agent.** It watches your service's
 logs, and the moment an unhandled exception appears it asks Claude to read your
 actual source code, diagnose the root cause, file a Jira ticket, and open a
 draft GitHub PR — so a human gets a grounded explanation and a starting point
 instead of a raw stack trace at 2 a.m.
 
-Kure follows **Detect → Diagnose → Fix → Deliver** — it reads your code, writes
+AutoFix follows **Detect → Diagnose → Fix → Deliver** — it reads your code, writes
 the fix *and* a regression test, proves it with the build, then opens a draft PR
 for a human to approve (see [Status](#status)).
 
 ```
 ┌──────────────────────┐  exception   ┌──────────────────────┐  diagnosis   ┌──────────────────┐
-│  YOUR SERVICE        │  written to  │  KURE  (this repo)   │  +  draft    │  Jira ticket     │
+│  YOUR SERVICE        │  written to  │  AutoFix(this repo)  │  +  draft    │  Jira ticket     │
 │  (any app that logs  │  ─────────▶  │  watch → parse →     │  ─────────▶  │  GitHub draft PR │
 │   to a file)         │   app.log    │  diagnose w/ Claude  │              │  (human reviews) │
 └──────────────────────┘              └──────────────────────┘              └──────────────────┘
 ```
 
-Kure never merges anything on its own. Every result lands as a **draft PR for
+AutoFix never merges anything on its own. Every result lands as a **draft PR for
 human review**.
 
 ---
@@ -41,9 +41,9 @@ human review**.
 
 ## The 7 Stages
 
-![Kure — the 7-stage self-healing flow](docs/kure-flow.png)
+![AutoFix — the 7-stage self-healing flow](docs/AutoFix-flow.png)
 
-Kure runs every incident through the same seven stages:
+AutoFix runs every incident through the same seven stages:
 
 | # | Stage | What happens |
 |---|-------|--------------|
@@ -55,7 +55,7 @@ Kure runs every incident through the same seven stages:
 | 6 | **Update Jira** | Enrich the ticket with the root cause, the fix, and the PR link. |
 | 7 | **Notify** | Post the final Slack summary: fix written, tests green, PR ready for review. |
 
-> Stages 1–3 and 5–7 are deterministic plumbing. Stage 4 is the intelligent core — an autonomous **Claude Agent SDK** loop. A human always reviews and merges the PR; Kure never auto-merges.
+> Stages 1–3 and 5–7 are deterministic plumbing. Stage 4 is the intelligent core — an autonomous **Claude Agent SDK** loop. A human always reviews and merges the PR; AutoFix never auto-merges.
 
 ---
 
@@ -68,17 +68,17 @@ Kure runs every incident through the same seven stages:
 | **Fix** — Claude edits the code, writes a regression test, runs `./mvnw test` | ✅ Working (verified end-to-end) |
 | **Deliver** — Jira ticket + draft GitHub PR + Slack notification | ✅ Working (mock/skip fallback without creds) |
 
-Kure detects an exception, has the agent write the fix **and** a passing
+AutoFix detects an exception, has the agent write the fix **and** a passing
 regression test (proven by running the build), then files a ticket, opens a
 **draft** PR, and pings Slack. A human reviews and approves — nothing
 auto-merges. Jira/GitHub/Slack run in mock/skip mode until you provide
 credentials.
 
 > **Slack live delivery (P8) — working.** Verified end-to-end against a real
-> incoming webhook (`#kure-notifications`). Delivery uses a fallback chain:
+> incoming webhook (`#AutoFix-notifications`). Delivery uses a fallback chain:
 > **(1) direct** (`SLACK_BOT_TOKEN`/`SLACK_WEBHOOK_URL` in `.env`) →
 > **(2) interim agent bridge** (Claude Agent SDK posts via an already-approved
-> Slack MCP, opt-in with `KURE_SLACK_AGENT_BRIDGE=1`) → **(3) demo** (sends
+> Slack MCP, opt-in with `AutoFix_SLACK_AGENT_BRIDGE=1`) → **(3) demo** (sends
 > nothing). Set your own `SLACK_WEBHOOK_URL` (or `xoxb-` bot token) in
 > `autopilot/.env` — each user brings their own; the webhook is never committed.
 
@@ -109,16 +109,16 @@ reusable as-is.
 
 | Tool | Version | Needed for |
 |---|---|---|
-| Python | 3.11+ | The Kure agent (`autopilot/`) |
+| Python | 3.11+ | The AutoFix agent (`autopilot/`) |
 | The Claude Code CLI **or** an Anthropic API key **or** a gateway | — | Talking to Claude (see [Connecting to Claude](#connecting-to-claude)) |
-| Java 17+ & Maven | only for the bundled demo backend | Trying Kure end-to-end before pointing it at your own service |
+| Java 17+ & Maven | only for the bundled demo backend | Trying AutoFix end-to-end before pointing it at your own service |
 | git | any | Version control + the GitHub PR step |
 
 ---
 
 ## Quick Start (5 minutes, using the bundled demo)
 
-The repo ships a deliberately-buggy demo service so you can watch Kure work
+The repo ships a deliberately-buggy demo service so you can watch AutoFix work
 before wiring it into your own system.
 
 ### 1. Start the agent
@@ -131,7 +131,7 @@ cp .env.example .env          # defaults are fine for a local keyless run
 python log_watcher.py --watch
 ```
 
-You'll see the blue **"Kure — Log Watcher"** panel. Leave it running.
+You'll see the blue **"AutoFix — Log Watcher"** panel. Leave it running.
 
 ### 2. Trigger an incident (separate terminal)
 
@@ -164,7 +164,7 @@ ones.
 
 ## Onboarding YOUR service
 
-1. **Point Kure at your log and your code** in `autopilot/.env`:
+1. **Point AutoFix at your log and your code** in `autopilot/.env`:
    ```ini
    LOG_PATH=/path/to/your/service/app.log
    TARGET_REPO_DIR=/path/to/your/service/repo
@@ -180,7 +180,7 @@ ones.
 
 ## Connecting to Claude
 
-Kure uses the **Claude Agent SDK** for diagnosis. Pick whichever auth fits — no
+AutoFix uses the **Claude Agent SDK** for diagnosis. Pick whichever auth fits — no
 code changes needed:
 
 | Option | When | How |
@@ -191,7 +191,7 @@ code changes needed:
 
 > **Headless/CI note:** the keyless login lives in your user environment, so it
 > does **not** exist on a build agent. For unattended runs (e.g. the Jenkins
-> stage), provide an API key or gateway — otherwise Kure degrades to its
+> stage), provide an API key or gateway — otherwise AutoFix degrades to its
 > fallback diagnosis and prints a ⚠ warning.
 
 The default model is **`claude-sonnet-4-6`** (override with `CLAUDE_MODEL`).
@@ -201,8 +201,8 @@ The default model is **`claude-sonnet-4-6`** (override with `CLAUDE_MODEL`).
 ## Repository Layout
 
 ```
-kure-self-healing-pipeline/
-├── autopilot/                      The Kure agent (Python) — this is the product
+AutoFix-self-healing-pipeline/
+├── autopilot/                      The AutoFix agent (Python) — this is the product
 │   ├── config.py                   central config (Claude auth, paths, model)
 │   ├── log_reader.py               parses log exceptions → structured incident   ⚙️ stack-specific
 │   ├── log_watcher.py              real-time log tailer
@@ -215,8 +215,8 @@ kure-self-healing-pipeline/
 │   ├── requirements.txt
 │   └── .env.example
 │
-├── backend/                        Bundled demo service (Spring Boot) for trying Kure
-├── Jenkinsfile                     CI pipeline (build/test demo + Kure incident check)
+├── backend/                        Bundled demo service (Spring Boot) for trying AutoFix
+├── Jenkinsfile                     CI pipeline (build/test demo + AutoFix incident check)
 ├── reset.sh                        demo cleanup script
 └── README.md
 ```
@@ -235,7 +235,7 @@ python -m pytest -m integration -s tests/test_claude_agent.py   # live SDK call 
 
 ## Credentials & secrets (each user brings their own)
 
-Kure ships **no** tokens. Every integration credential is personal and stays on
+AutoFix ships **no** tokens. Every integration credential is personal and stays on
 your machine:
 
 - Copy the template and fill in your own values:
@@ -248,16 +248,16 @@ your machine:
   Tokens are scoped to the person who creates them, so a token committed by one
   person would both leak a secret and act as the wrong identity.
 
-### Getting a Slack credential (for `#kure-notifications`)
+### Getting a Slack credential (for `#AutoFix-notifications`)
 
 > Heads-up: in a managed workspace (e.g. Curriculum Associates), creating a
 > Slack app may need admin approval — if so, file an IT Helpdesk request first.
 
 **Option A — Incoming webhook (simplest, one channel):**
 1. Go to <https://api.slack.com/apps> → **Create New App → From scratch**; name it
-   `Kure`, pick your workspace.
+   `AutoFix`, pick your workspace.
 2. **Features → Incoming Webhooks → toggle On**.
-3. **Add New Webhook to Workspace** → choose **#kure-notifications** → **Allow**.
+3. **Add New Webhook to Workspace** → choose **#AutoFix-notifications** → **Allow**.
 4. Copy the URL (`https://hooks.slack.com/services/T…/B…/…`) into `autopilot/.env`:
    ```ini
    SLACK_WEBHOOK_URL=https://hooks.slack.com/services/T…/B…/…
@@ -267,15 +267,15 @@ your machine:
 **Option B — Bot token (targets a named channel, more flexible):**
 1. Same app → **OAuth & Permissions → Scopes → Bot Token Scopes → add `chat:write`**.
 2. **Install to Workspace**, then copy the **Bot User OAuth Token** (`xoxb-…`).
-3. In Slack, invite the bot to the channel: `/invite @Kure` in **#kure-notifications**.
+3. In Slack, invite the bot to the channel: `/invite @AutoFix` in **#AutoFix-notifications**.
 4. In `autopilot/.env`:
    ```ini
    SLACK_BOT_TOKEN=xoxb-…
-   SLACK_CHANNEL=#kure-notifications
+   SLACK_CHANNEL=#AutoFix-notifications
    ```
 
 Either way, run `python autopilot.py` — on a real incident the summary posts to
-`#kure-notifications`. With neither set, Slack stays in demo mode (sends nothing).
+`#AutoFix-notifications`. With neither set, Slack stays in demo mode (sends nothing).
 
 The same "bring your own token" pattern applies to **Jira** (`JIRA_TOKEN`, from
 <https://id.atlassian.com/manage-profile/security/api-tokens>) and **GitHub**
@@ -285,9 +285,9 @@ The same "bring your own token" pattern applies to **Jira** (`JIRA_TOKEN`, from
 
 ## Safety & responsible use
 
-- **Human-in-the-loop:** Kure opens *draft* PRs and never auto-merges.
+- **Human-in-the-loop:** AutoFix opens *draft* PRs and never auto-merges.
 - **Synthetic data only:** the demo uses fake student names/IDs/scores — no real
-  PII. Keep real PII out of logs you point Kure at, since log contents are sent
+  PII. Keep real PII out of logs you point AutoFix at, since log contents are sent
   to Claude for diagnosis.
-- **Review like any AI-assisted change:** anything Kure proposes goes through
+- **Review like any AI-assisted change:** anything AutoFix proposes goes through
   your normal code review, CI, and security scanning before merge.
