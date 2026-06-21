@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>AutoFix — Self-Healing Flow</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', Inter, system-ui, sans-serif;
+    background: radial-gradient(circle at 30% 20%, #1e293b, #0f172a);
+    color: #e2e8f0;
+    padding: 48px 32px;
+    display: flex; flex-direction: column; align-items: center;
+  }
+  h1 { font-size: 30px; font-weight: 800; letter-spacing: -0.5px; }
+  h1 .k { color: #38bdf8; }
+
+  .lane {
+    display: flex; align-items: stretch; gap: 0;
+    flex-wrap: wrap; justify-content: center; max-width: 1180px;
+  }
+  .card {
+    width: 158px; background: #1e293b; border: 1px solid #334155;
+    border-radius: 16px; padding: 16px 14px; text-align: center;
+    box-shadow: 0 8px 24px rgba(0,0,0,.35); position: relative;
+  }
+  .num {
+    position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+    width: 24px; height: 24px; border-radius: 50%; font-size: 13px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center; color: #0f172a;
+  }
+  .icon { font-size: 30px; margin: 6px 0 8px; }
+  .title { font-size: 14px; font-weight: 700; color: #f1f5f9; }
+  .desc { font-size: 11.5px; color: #94a3b8; margin-top: 5px; line-height: 1.35; }
+  .arrow { display: flex; align-items: center; color: #475569; font-size: 22px; padding: 0 4px; }
+
+  .c-detect .num { background:#38bdf8 } .c-detect { border-color:#38bdf8 }
+  .c-jira   .num { background:#a78bfa } .c-jira   { border-color:#a78bfa }
+  .c-slack  .num { background:#22c55e } .c-slack  { border-color:#22c55e }
+  .c-fix    .num { background:#f59e0b } .c-fix    { border-color:#f59e0b }
+  .c-pr     .num { background:#ec4899 } .c-pr     { border-color:#ec4899 }
+
+  .ends { display:flex; gap:40px; margin:24px 0 26px; }
+  .end {
+    background:#0b1220; border:1px dashed #475569; border-radius:14px;
+    padding:14px 22px; text-align:center; font-size:13px; color:#cbd5e1;
+  }
+  .end .icon { font-size:24px; }
+</style>
+</head>
+<body>
+  <h1><span class="k">AutoFix</span> — Self-Healing Agent</h1>
+
+  <div class="ends">
+    <div class="end">
+      <div class="icon">💥</div>
+      <div><b>Your Service</b><br/><b>Hits an ERROR</b></div>
+    </div>
+  </div>
+
+  <div class="lane">
+    <div class="card c-detect"><div class="num">1</div><div class="icon">🔍</div><div class="title">Detect</div><div class="desc">Tail the log, parse the stack trace into a structured incident</div></div>
+    <div class="arrow">➜</div>
+    <div class="card c-jira"><div class="num">2</div><div class="icon">🎫</div><div class="title">Log Jira</div><div class="desc">Open ticket <b>KR-N</b> — “diagnosis in progress…”</div></div>
+    <div class="arrow">➜</div>
+    <div class="card c-slack"><div class="num">3</div><div class="icon">📢</div><div class="title">Notify</div><div class="desc">Slack: “detected · KR-N created · working on a fix…”</div></div>
+    <div class="arrow">➜</div>
+    <div class="card c-fix"><div class="num">4</div><div class="icon">🤖</div><div class="title">Fix + Test</div><div class="desc">Claude edits code, adds regression test, runs <code>mvn test</code> ✅</div></div>
+    <div class="arrow">➜</div>
+    <div class="card c-pr"><div class="num">5</div><div class="icon">🔀</div><div class="title">Open PR</div><div class="desc">Push branch, open draft PR <b>[AutoFix][KR-N]</b></div></div>
+    <div class="arrow">➜</div>
+    <div class="card c-jira"><div class="num">6</div><div class="icon">🎫</div><div class="title">Update Jira</div><div class="desc">Enrich KR-N: root cause · fix · test · PR link</div></div>
+    <div class="arrow">➜</div>
+    <div class="card c-slack"><div class="num">7</div><div class="icon">✅</div><div class="title">Notify (done)</div><div class="desc">Slack: “fix + test · build green · PR #N”</div></div>
+  </div>
+
+  <div class="ends">
+    <div class="end">
+      <div class="icon">👩‍💻</div>
+      <div><b>Human reviews &amp; merges</b><br/>AutoFix never auto-merges</div>
+    </div>
+  </div>
+</body>
+</html>
