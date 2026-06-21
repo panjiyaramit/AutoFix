@@ -27,7 +27,7 @@ pipeline {
   }
 
   environment {
-    APP_NAME = 'kure-self-healing-pipeline'
+    APP_NAME = 'AutoFix-self-healing-pipeline'
   }
 
   stages {
@@ -119,18 +119,18 @@ pipeline {
       }
     }
 
-    stage('Kure — AutoPilot Incident Check') {
+    stage('AutoFix — AutoPilot Incident Check') {
       when {
         expression { isMainline() }
       }
       // NOTE: this is a headless agent — there is no interactive Claude Code
-      // login here, so Kure's *live* diagnosis needs an explicit credential.
+      // login here, so AutoFix's *live* diagnosis needs an explicit credential.
       // Without one it still runs but uses its fallback diagnosis (and logs a
       // ⚠ warning). To enable live diagnosis, create a Jenkins secret-text
       // credential and uncomment the environment block below:
       //
       //   environment {
-      //     ANTHROPIC_API_KEY = credentials('kure-anthropic-api-key')
+      //     ANTHROPIC_API_KEY = credentials('AutoFix-anthropic-api-key')
       //     // or, for a corporate gateway:
       //     // CLAUDE_BASE_URL = 'https://your-gateway.example.com/anthropic'
       //   }
@@ -156,7 +156,7 @@ pipeline {
       script {
         if (isMainline()) {
           slackSend(
-            channel: '#kure-builds',
+            channel: '#AutoFix-builds',
             color: '#00FF00',
             message: """
               |✅ *${APP_NAME}* build passed
@@ -169,7 +169,7 @@ pipeline {
     }
     failure {
       slackSend(
-        channel: '#kure-builds',
+        channel: '#AutoFix-builds',
         color: '#FF0000',
         message: """
           |❌ *${APP_NAME}* build failed
