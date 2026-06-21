@@ -1,0 +1,13 @@
+# Claude Agent SDK — powers the live diagnosis in claude_agent.py.
+# Without it, the orchestrator silently falls back to a canned diagnosis.
+claude-agent-sdk>=0.2.0
+
+# Anthropic SDK — used by detector.py's streaming summary path.
+anthropic>=0.40.0
+
+requests>=2.32.0
+gitpython>=3.1.0
+rich>=13.7.0
+python-dotenv>=1.0.0
+# Uses the OS trust store so HTTPS works behind corporate TLS inspection.
+truststore>=0.9.0
