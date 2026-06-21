@@ -41,7 +41,7 @@ human review**.
 
 ## The 7 Stages
 
-![AutoFix — the 7-stage self-healing flow](autofix-flow.png)
+![AutoFix — the 7-stage self-healing flow](autopilot/autofix-flow.png)
 
 AutoFix runs every incident through the same seven stages:
 
